@@ -14,10 +14,10 @@ wa.TextStrokeTransparency = 0
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-   Name = "TD: 1.3 (Testing)",
+   Name = "TD 1.3",
    Icon = 0,
    LoadingTitle = "Wait...",
-   LoadingSubtitle = "by Bi_6ondo",
+   LoadingSubtitle = "by ???",
    Theme = "Ocean"
 })
 local Tab = Window:CreateTab("Main", 0)
@@ -169,7 +169,7 @@ spawn(function()
 end)
 
 Tab:CreateButton({
-Name = "Keep the same morph for the next match\n (not work in the 3rd match)",
+Name = "Keep the same morph for the next match\n (Not work in the 3rd match)",
 Callback = function()
 local player = game.Players.LocalPlayer
 local humanoid = player.Character and player.Character:FindFirstChildWhichIsA("Humanoid")
@@ -405,6 +405,8 @@ local Toggle = Tab:CreateToggle({
 })
 local teleporting = false
 local targetPlayer = nil
+local currentPlayerHealth = 0
+local gravityEnabled = false
 
 local displayPlayers = game:GetService("ReplicatedStorage"):FindFirstChild("displayPlayers")
 if not displayPlayers then
@@ -419,54 +421,76 @@ local function getNextPlayerWithHealth()
             if health and health.Value > 0 then
                 local player = game.Players:FindFirstChild(playerFolder.Name)
                 if player then
-                    return player
+                    return player, health.Value
                 end
             end
         end
     end
-    return nil
+    return nil, 0
 end
 
 local function teleportToPlayer()
     while teleporting do
-        targetPlayer = getNextPlayerWithHealth()
-        
+        targetPlayer, currentPlayerHealth = getNextPlayerWithHealth()
+
         if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
             local playerRoot = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
             local targetRoot = targetPlayer.Character.HumanoidRootPart
             if playerRoot then
-                playerRoot.CFrame = targetRoot.CFrame * CFrame.new(0, -10, 0)
+                playerRoot.CFrame = targetRoot.CFrame * CFrame.new(0, -9, 0)
             end
-local args = {
-    [1] = "grab"
-}
 
-game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("abilities"):FireServer(unpack(args))
-
-
-            local args = {
-                [1] = "attack"
-            }
+            local args = { [1] = "grab" }
             game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("abilities"):FireServer(unpack(args))
 
-            local minionArgs = {
-                [1] = "minionAttack"
-            }
+            local args = { [1] = "attack" }
+            game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("abilities"):FireServer(unpack(args))
+
+            local minionArgs = { [1] = "minionAttack" }
             game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("abilities"):FireServer(unpack(minionArgs))
 
             for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
-                local args = {
-                    [1] = workspace:WaitForChild(player.Name)
-                }
+                local args = { [1] = workspace:WaitForChild(player.Name) }
                 game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("hitReg"):FireServer(unpack(args))
             end
         end
-        wait(0.05)
+        task.wait(0)
+    end
+end
+
+local function setGravity(enabled)
+    if enabled then
+        workspace.Gravity = 5
+    else
+        workspace.Gravity = 196.2
+    end
+end
+
+local Clip = false
+local speaker = game.Players.LocalPlayer
+local floatName = "FloatPart"
+local RunService = game:GetService("RunService")
+
+local Noclipping
+
+local function NoclipLoop()
+    if Clip == true and speaker.Character ~= nil then
+        for _, child in pairs(speaker.Character:GetDescendants()) do
+            if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
+                child.CanCollide = false
+            end
+        end
+    else
+        for _, child in pairs(speaker.Character:GetDescendants()) do
+            if child:IsA("BasePart") and child.Name ~= floatName then
+                child.CanCollide = true
+            end
+        end
     end
 end
 
 local Toggle = Tab:CreateToggle({
-    Name = "Kill All 2 (Dont use, we are testing)",
+    Name = "Kill All 2 (Nearly completed, usable now but can be risky)",
     CurrentValue = false,
     Flag = "ToggleKillAll",
     Callback = function(Value)
@@ -474,9 +498,39 @@ local Toggle = Tab:CreateToggle({
         if teleporting then
             teleportToPlayer()
         end
+
+        gravityEnabled = not gravityEnabled
+        setGravity(gravityEnabled)
+
+        Clip = Value
+        if Clip then
+            Noclipping = RunService.Stepped:Connect(NoclipLoop)
+        else
+            if Noclipping then
+                Noclipping:Disconnect()
+            end
+        end
     end,
 })
 
+local previousHealth = 0
+local function checkHealthChange()
+    while teleporting do
+        local player, healthValue = getNextPlayerWithHealth()
+        if player and healthValue ~= previousHealth and healthValue > 0 then
+            previousHealth = healthValue
+            teleporting = false
+
+            if healthValue > 0 then
+                teleporting = true
+                teleportToPlayer()
+            end
+        end
+        task.wait(1)
+    end
+end
+
+task.spawn(checkHealthChange)
 local Tab = Window:CreateTab("Client", 0)
 
 local Input = Tab:CreateInput({
@@ -510,7 +564,7 @@ for _, skybox in ipairs(SkyboxesFolder:GetChildren()) do
 end
 
 local Dropdown = Tab:CreateDropdown({
-   Name = "Chọn SkyBox",
+   Name = "Choose SkyBox",
    Options = Skyboxes,
    CurrentOption = {Skyboxes[1]},
    MultipleOptions = false,
@@ -529,3 +583,40 @@ local Dropdown = Tab:CreateDropdown({
        end
    end,
 })
+
+if _G.SR then return end
+_G.SR = true
+
+local who = game.Players.LocalPlayer
+
+local Notify = game.CoreGui.CallDialogScreen
+Notify.Enabled = true 
+
+local settext = game.CoreGui.CallDialogScreen.CallDialog.AlertContents.Footer.Buttons[1].ButtonContent.ButtonMiddleContent.Text
+settext.Text = "Close" 
+settext.Size = UDim2.new(1, 0, 1, 0)
+local intro = game.CoreGui.CallDialogScreen.CallDialog.AlertContents.MiddleContent.Content.BodyText
+intro.Text = "Hello " .. who.Name .. " \nVer 1.3 (25/12/2024🎄)\n"
+intro.Size = UDim2.new(1, 0, 0, 40)
+
+local close = Instance.new("TextButton", settext)
+close.Size = UDim2.new(1, 0, 1, 0)
+close.BackgroundTransparency = 1
+close.Text = ""
+close.MouseButton1Click:Connect(function()
+    Notify.Enabled = false
+    close:Destroy()
+end)
+
+local title = game.CoreGui.CallDialogScreen.CallDialog.AlertContents.TitleContainer.TitleArea.Title
+title.Text = "Last updated"
+title.Size = UDim2.new(1, 0, 0, 26)
+
+local texts = {"Hello " .. who.Name .. " \nVer 1.3 (25/12/2024🎄)\n", "By ACE1991ACE, ACE1991ACE_ALT, neoxhackbiem(number), bi_6ondo, bi_em6ondo"}
+local i = 1
+
+while true do
+    intro.Text = texts[i]
+    i = i % #texts + 1
+    wait(1) 
+end
