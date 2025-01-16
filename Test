@@ -1,0 +1,31 @@
+local Tab = Window:CreateTab("Main", 0)
+local Dropdown = Tab:CreateDropdown({
+   Name = "Emotes",
+   Options = {"angry", "glad", "surprised", "sad", "happy", "worried", "confused", "tired", "enraged", "hurt"},
+   CurrentOption = {"Choose Emote"},
+   MultipleOptions = false,
+   Flag = "Dropdown1",
+   Callback = function(Options)
+       if Options[1] ~= "none" then
+           local args = {
+               [1] = Options[1]
+           }
+           game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("expressions"):FireServer(unpack(args))
+       end
+   end,
+})
+local Dropdown = Tab:CreateDropdown({
+   Name = "Eyes",
+   Options = {"bloodshot", "regularEyes", "removeBloodshot", "scaredEyes"},
+   CurrentOption = {"Choose Eyes"},
+   MultipleOptions = false,
+   Flag = "Dropdown1",
+   Callback = function(Options)
+       if Options[1] ~= "none" then
+           local args = {
+               [1] = Options[1]
+           }
+           game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("expressions"):FireServer(unpack(args))
+       end
+   end,
+})
