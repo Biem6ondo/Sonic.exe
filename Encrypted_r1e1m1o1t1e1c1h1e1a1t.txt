@@ -14,7 +14,7 @@ wa.TextStrokeTransparency = 0
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-   Name = "TD 1.3",
+   Name = "TD 1.31 (Updating...)",
    Icon = 0,
    LoadingTitle = "Wait...",
    LoadingSubtitle = "by ???",
@@ -189,11 +189,11 @@ local Tab = Window:CreateTab("Teleport", 0)
 Tab:CreateButton({
 Name = "Teleport to Lobby",
 Callback = function()
-game.Players.LocalPlayer.Character:MoveTo(Vector3.new(0, 1, 0))
+game.Players.LocalPlayer.Character:MoveTo(Vector3.new(0, 10, 0))
 end,
 })
 Tab:CreateButton({
-Name = "Teleport to Game",
+Name = "Teleport to Game (Can fall the void)",
 Callback = function()
 game.Players.LocalPlayer.Character:MoveTo(Vector3.new(-272, 155, -313))
 end,
@@ -215,8 +215,6 @@ end
 
 local Animations = {
     { Name = "Sonic.exe 2 Idle", Id = "rbxassetid://137659262960225" },
-    { Name = "ID:1", Id = "http://www.roblox.com/asset/?id=180426354" },
-    { Name = "Eyes.R", Id = "rbxassetid://110264241144654" },
     { Name = "Tails Cannon", Id = "rbxassetid://138560715967682" },
     { Name = "Tails Glide", Id = "rbxassetid://136705072136812" },
     { Name = "Amy Arm Idle", Id = "rbxassetid://16548210127" },
@@ -294,7 +292,7 @@ for _, player in pairs(Players:GetPlayers()) do
 end
 
 local Dropdown = Tab:CreateDropdown({
-    Name = "Choose Player To Shield (Need)",
+    Name = "Choose Player To Shield (Need Sally)",
     Options = playerNames,
     CurrentOption = {"None"},
     MultipleOptions = false,
@@ -584,6 +582,18 @@ local Dropdown = Tab:CreateDropdown({
    end,
 })
 
+Tab:CreateButton({
+Name = "No fog",
+Callback = function()
+while wait(0.4) do
+game.Lighting.atmosphere.Density = 0
+game.Lighting.blur.Enabled = false
+game.Lighting.bloom.Enabled = false
+game.Lighting.colorCorrection.Enabled = false
+end
+end,
+})
+
 if _G.SR then return end
 _G.SR = true
 
@@ -612,7 +622,7 @@ local title = game.CoreGui.CallDialogScreen.CallDialog.AlertContents.TitleContai
 title.Text = "Last updated"
 title.Size = UDim2.new(1, 0, 0, 26)
 
-local texts = {"Hello " .. who.Name .. " \nVer 1.3 (25/12/2024🎄)\n", "By ACE1991ACE, ACE1991ACE_ALT, neoxhackbiem(number), bi_6ondo, bi_em6ondo"}
+local texts = {"Hello " .. who.Name .. " \nVer 1.31 (17/2/2024)\n", "By ACE1991ACE, ACE1991ACE_ALT, neoxhackbiem(number), bi_6ondo, bi_em6ondo"}
 local i = 1
 
 while true do
