@@ -333,6 +333,26 @@ game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("actio
 end,
 })
 
+loadstring(game:HttpGet("https://rawscripts.net/raw/Sonic.EXE:-The-Disaster-1.3-silver-barrier-spam-READ-DESCRIPTION-27019"))()
+local scr = game.Players.LocalPlayer.PlayerGui.ScreenGui
+scr.ResetOnSpawn = false
+local spam = game.Players.LocalPlayer.PlayerGui.ScreenGui.TextButton
+spam.Position = UDim2.new(0, 0, 0.5, -25)
+spam.Visible = false
+spam.TextSize = 24
+spam.TextColor3 = Color3.new(1, 1, 1)
+spam.BackgroundColor3 = Color3.new(0, 0, 0)
+local corner = Instance.new("UICorner", spam)
+corner.CornerRadius = UDim.new(1, 0)
+local Toggle = Tab:CreateToggle({
+   Name = "Toggle Sliver Spam wall (not mine)",
+   CurrentValue = false,
+   Flag = "Ya",  
+   Callback = function(Value)
+spam.Visible = Value
+end,
+})
+
 local Tab = Window:CreateTab("Sonic.exe and minion", 0)
 local teleporting = false
 local targetPlayer = nil
